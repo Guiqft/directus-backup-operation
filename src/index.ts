@@ -21,7 +21,7 @@ export default defineEndpoint({
             schema,
         })
 
-        router.get("/", async (_req, res, next) => {
+        router.post("/", async (_req, res, next) => {
             const fileName = getFileName()
             try {
                 const { user, database, host, port, password } = (

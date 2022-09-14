@@ -18,10 +18,16 @@ Clone this project inside your `/extensions/endpoints` folder, then:
 cd directus-backup-endpoint/
 ```
 
-
 ```bash
 yarn && yarn build
 ```
+
+
+After activate the extension, you can just do
+```
+/POST <directus_url>/backup
+```
+and check it your `.dump` file into Directus files 🚀
 
 ## Configuration
 
