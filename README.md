@@ -2,7 +2,7 @@
 
 <br />
 <p align="center">
-  <img src="https://i.ibb.co/4mY5Mcv/35190391-removebg-preview.png" alt="35190391-removebg-preview" border="0" height="180" width="180"/>
+  <img src="https://i.ibb.co/3dLBPqd/image-removebg-preview-4.png" alt="35190391-removebg-preview" border="0" height="180" width="180"/>
   <p align="center">
     Custom Directus endpoint to backup the database using <code>pg_dump</code> and upload the <code>.dump</code> file into Directus files.
     <br />
