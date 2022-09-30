@@ -9,6 +9,11 @@
   </p>
 </p>
 
+## Prerequisites
+
+Make sure you have installed the following prerequisites on your Directus machine. 
+
+- PostgreSQL Client - [Install PSQL](https://packages.ubuntu.com/bionic/any/postgresql-client). Needs to be installed so Node can spawn `pg_dump` process. If running in Docker, you can check this [example repo](https://github.com/Guiqft/directus-psql-docker-example).
 
 ## Usage
 
