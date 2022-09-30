@@ -1,11 +1,13 @@
 import { defineEndpoint } from "@directus/extensions-sdk"
 import { FilesService, FoldersService } from "directus"
-import { execute } from "@getvim/execute"
 import * as dotenv from "dotenv"
 import fs from "fs"
+import util from "util"
+import childProccess from "child_process"
 
 import { errorHandler, getFileName, getFolderId } from "./utils"
 
+const exec = util.promisify(childProccess.exec)
 dotenv.config({ debug: true, path: __dirname + "/.env" })
 
 export default defineEndpoint({
@@ -28,15 +30,9 @@ export default defineEndpoint({
                     db.client as IDbClient
                 ).connectionSettings
 
-                await execute(`pg_dump --format=c --file=${fileName}`, {
-                    env: {
-                        PGHOST: host,
-                        PGPORT: String(port),
-                        PGDATABASE: database,
-                        PGUSER: user,
-                        PGPASSWORD: password,
-                    },
-                })
+                await exec(
+                    `PGHOST=${host} PGPORT=${port} PGDATABASE=${database} PGUSER=${user} PGPASSWORD=${password} pg_dump --format=c --file=${fileName}`
+                )
 
                 await filesService.uploadOne(fs.createReadStream(fileName), {
                     title: fileName,
