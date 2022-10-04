@@ -1,5 +1,4 @@
 import { FoldersService } from "directus"
-import { Request, NextFunction, Response } from "express"
 
 export const getFileName = () => {
     const date = new Date()
@@ -10,37 +9,17 @@ export const getFileName = () => {
 }
 
 export const getFolderId = async (
+    name: string,
     service: FoldersService
 ): Promise<string | undefined> => {
-    let folderId
-    if (process.env.DIRECTUS_BACKUPS_FOLDER) {
-        const [folder] = await service.readByQuery({
-            filter: { name: { _eq: process.env.DIRECTUS_BACKUPS_FOLDER } },
-            limit: 1,
-        })
-
-        if (!folder) {
-            throw new Error("Invalid backup folder config")
-        }
-
-        folderId = folder.id
-    }
-
-    return folderId
-}
-
-export const errorHandler = (
-    err: any,
-    _: Request,
-    res: Response,
-    next: NextFunction
-) => {
-    if (res.headersSent) {
-        return next(err)
-    }
-    res.status(err.status || 500)
-    res.json({
-        error: { ...err },
-        message: err.message,
+    const [folder] = await service.readByQuery({
+        filter: { name: { _eq: name } },
+        limit: 1,
     })
+
+    if (!folder) {
+        throw new Error("Invalid backup folder config")
+    }
+
+    return folder.id
 }
