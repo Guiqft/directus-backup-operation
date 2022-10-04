@@ -17,13 +17,13 @@
         "strictFunctionTypes": true,
         "strictBindCallApply": true,
         "strictPropertyInitialization": true,
-        "resolveJsonModule": false,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
         "allowSyntheticDefaultImports": true,
         "isolatedModules": true,
-        "rootDir": "./src",
-        "sourceMap": true
+        "rootDir": ".",
+        "sourceMap": true,
+        "resolveJsonModule": true
     },
     "include": ["./src/**/*.ts"]
 }
