@@ -1,11 +1,11 @@
 import { defineOperationApi } from "@directus/extensions-sdk"
-import { FilesService, FoldersService } from "directus"
+import { FilesService } from "directus"
 import fs from "fs"
 import util from "util"
 import childProccess from "child_process"
 
 import pkg from "../package.json"
-import { getFileName, getFolderId } from "./utils"
+import { getFileName } from "./utils"
 
 const exec = util.promisify(childProccess.exec)
 
@@ -20,9 +20,6 @@ export default defineOperationApi<{ folder: string }>({
         const filesService: FilesService = new services.FilesService({
             schema,
             knex: db,
-        })
-        const foldersService: FoldersService = new services.FoldersService({
-            schema,
         })
 
         const fileName = getFileName()
@@ -39,10 +36,8 @@ export default defineOperationApi<{ folder: string }>({
                 title: fileName,
                 type: "application/octet-stream",
                 filename_download: fileName,
-                storage: "local",
-                folder: folder
-                    ? await getFolderId(folder, foldersService)
-                    : undefined,
+                storage: "s3",
+                folder: folder ?? undefined,
             })
             fs.unlinkSync(fileName)
 

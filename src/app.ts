@@ -17,12 +17,15 @@ export default defineOperationApp({
     options: [
         {
             field: "folder",
-            name: "Folder",
-            type: "string",
+            name: "$t:interfaces.system-folder.folder",
+            type: "uuid",
             meta: {
-                note: "Where to put your backups",
-                width: "full",
-                interface: "input",
+                width: "half",
+                interface: "system-folder",
+                note: "$t:interfaces.system-folder.field_hint",
+            },
+            schema: {
+                default_value: undefined,
             },
         },
     ],
