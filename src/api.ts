@@ -9,10 +9,10 @@ import { getFileName } from "./utils"
 
 const exec = util.promisify(childProccess.exec)
 
-export default defineOperationApi<{ folder: string }>({
+export default defineOperationApi<{ storage: string; folder: string }>({
     id: "backup",
     handler: async (
-        { folder },
+        { storage, folder },
         { database: db, services, getSchema, logger }
     ) => {
         const schema = await getSchema()
@@ -33,10 +33,10 @@ export default defineOperationApi<{ folder: string }>({
             )
 
             await filesService.uploadOne(fs.createReadStream(fileName), {
+                storage,
                 title: fileName,
                 type: "application/octet-stream",
                 filename_download: fileName,
-                storage: "s3",
                 folder: folder ?? undefined,
             })
             fs.unlinkSync(fileName)
