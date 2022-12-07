@@ -37,6 +37,7 @@ export default defineOperationApp({
             name: "Storage",
             type: "string",
             meta: {
+                width: "half",
                 interface: "select-dropdown",
                 options: {
                     choices: storageOptions,
@@ -69,6 +70,40 @@ export default defineOperationApp({
             },
             schema: {
                 default_value: undefined,
+            },
+        },
+        {
+            field: "customConnection",
+            name: "Custom Connection",
+            type: "json",
+            meta: {
+                width: "full",
+                interface: "input-code",
+                options: {
+                    language: "json",
+                    placeholder: JSON.stringify(
+                        {
+                            host: "localhost",
+                            port: 8432,
+                            database: "directus",
+                            user: "directus",
+                            password: "password",
+                        },
+                        null,
+                        2
+                    ),
+                    template: JSON.stringify(
+                        {
+                            host: "localhost",
+                            port: 8432,
+                            database: "directus",
+                            user: "directus",
+                            password: "password",
+                        },
+                        null,
+                        2
+                    ),
+                },
             },
         },
     ],

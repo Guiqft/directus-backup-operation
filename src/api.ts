@@ -9,10 +9,14 @@ import { getFileName } from "./utils"
 
 const exec = util.promisify(childProccess.exec)
 
-export default defineOperationApi<{ storage: string; folder: string }>({
+export default defineOperationApi<{
+    storage?: string
+    folder?: string
+    customConnection?: IConnection
+}>({
     id: "backup",
     handler: async (
-        { storage, folder },
+        { storage, folder, customConnection },
         { database: db, services, getSchema, logger }
     ) => {
         const schema = await getSchema()
@@ -22,14 +26,23 @@ export default defineOperationApi<{ storage: string; folder: string }>({
             knex: db,
         })
 
-        const fileName = getFileName()
+        const connection: IConnection =
+            customConnection ?? db.client.connectionSettings
+
+        const fileName = getFileName(connection)
+
         try {
-            const { user, database, host, port, password } = (
-                db.client as IDbClient
-            ).connectionSettings
+            logger.info(
+                `[${pkg.name}] Backing up connection to database ${connection.database} on host ${connection.host}`
+            )
 
             await exec(
-                `PGHOST=${host} PGPORT=${port} PGDATABASE=${database} PGUSER=${user} PGPASSWORD=${password} pg_dump --format=c --file=${fileName}`
+                `PGHOST=${connection.host} 
+                PGPORT=${connection.port} 
+                PGDATABASE=${connection.database} 
+                PGUSER=${connection.user} 
+                PGPASSWORD=${connection.password} 
+                pg_dump --format=c --file=${fileName}`
             )
 
             await filesService.uploadOne(fs.createReadStream(fileName), {
@@ -44,6 +57,10 @@ export default defineOperationApi<{ storage: string; folder: string }>({
             logger.info(
                 `[${pkg.name}] New database backup created: ${fileName}`
             )
+
+            return {
+                connection,
+            }
         } catch (e) {
             if (fs.existsSync(fileName)) {
                 fs.unlinkSync(fileName)
@@ -53,7 +70,10 @@ export default defineOperationApi<{ storage: string; folder: string }>({
                     (e as Error).message
                 }`
             )
-            throw e
+            throw {
+                connection,
+                error: (e as Error).message,
+            }
         }
     },
 })
