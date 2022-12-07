@@ -19,6 +19,8 @@ export default defineOperationApi<{
         { storage, folder, customConnection },
         { database: db, services, getSchema, logger }
     ) => {
+        const start = performance.now()
+
         const schema = await getSchema()
 
         const filesService: FilesService = new services.FilesService({
@@ -46,20 +48,25 @@ export default defineOperationApi<{
             )
 
             await filesService.uploadOne(fs.createReadStream(fileName), {
-                storage,
                 title: fileName,
                 type: "application/octet-stream",
                 filename_download: fileName,
+                storage: storage ?? "local",
                 folder: folder ?? undefined,
             })
-            fs.unlinkSync(fileName)
 
             logger.info(
                 `[${pkg.name}] New database backup created: ${fileName}`
             )
 
+            const size = fs.statSync(fileName).size
+            const time = (performance.now() - start) / 1000
+
+            fs.unlinkSync(fileName)
             return {
                 connection,
+                time,
+                size,
             }
         } catch (e) {
             if (fs.existsSync(fileName)) {
