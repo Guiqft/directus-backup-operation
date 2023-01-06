@@ -1,18 +1,18 @@
 import { defineOperationApp } from "@directus/extensions-sdk"
 
-const storageOptions = [
-    { text: "Local", value: "local" },
-    { text: "S3", value: "s3" },
-    { text: "Google Cloud Storage", value: "gcs" },
-    { text: "Azure", value: "azure" },
-]
-
 export default defineOperationApp({
     id: "backup",
     name: "Backup",
     icon: "backup",
     description: "Backup your Postgres DB",
     overview: ({ storage, folder }) => {
+        const storageOptions = [
+            { text: "Local", value: "local" },
+            { text: "S3", value: "s3" },
+            { text: "Google Cloud Storage", value: "gcs" },
+            { text: "Azure", value: "azure" },
+        ]
+
         const labels = [
             {
                 label: "Backup Storage",
@@ -39,13 +39,12 @@ export default defineOperationApp({
             meta: {
                 width: "half",
                 interface: "select-dropdown",
+                note: "Make sure you have the required configs",
+                required: true,
                 options: {
                     choices: storageOptions,
                     allowOther: true,
                 },
-            },
-            schema: {
-                default_value: "local",
             },
         },
         {
@@ -55,21 +54,7 @@ export default defineOperationApp({
             meta: {
                 width: "half",
                 interface: "system-folder",
-                note: "Where to put your backups",
-                conditions: [
-                    {
-                        rule: {
-                            storage: {
-                                _eq: "local",
-                            },
-                        },
-                        hidden: false,
-                    },
-                ],
-                hidden: true,
-            },
-            schema: {
-                default_value: undefined,
+                note: "Where to show your backups on Directus",
             },
         },
         {
