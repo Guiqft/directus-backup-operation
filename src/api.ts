@@ -1,13 +1,9 @@
 import { defineOperationApi } from "@directus/extensions-sdk"
 import { FilesService } from "directus"
-import fs from "fs"
-import util from "util"
 import childProccess from "child_process"
 
 import pkg from "../package.json"
-import { getFileName } from "./utils"
-
-const exec = util.promisify(childProccess.exec)
+import { getFileName, checkStreamError } from "./utils"
 
 export default defineOperationApi<{
     storage?: string
@@ -38,40 +34,44 @@ export default defineOperationApi<{
                 `[${pkg.name}] Backing up connection to database ${connection.database} on host ${connection.host}`
             )
 
-            await exec(
-                `PGHOST=${connection.host} 
-                PGPORT=${connection.port} 
-                PGDATABASE=${connection.database} 
-                PGUSER=${connection.user} 
-                PGPASSWORD=${connection.password} 
-                pg_dump --format=c --file=${fileName}`
+            const { stdout, stderr } = childProccess.exec(
+                `PGHOST=${connection.host} PGPORT=${connection.port} PGDATABASE=${connection.database} PGUSER=${connection.user} PGPASSWORD=${connection.password} pg_dump --format=c`
             )
 
-            await filesService.uploadOne(fs.createReadStream(fileName), {
+            const upload = filesService.uploadOne(stdout!, {
                 title: fileName,
                 type: "application/octet-stream",
                 filename_download: fileName,
                 storage: storage ?? "local",
                 folder: folder ?? undefined,
             })
+            const errors = checkStreamError(stderr)
+
+            await Promise.race([upload, errors]).catch((e) => {
+                throw new Error(e)
+            })
 
             logger.info(
                 `[${pkg.name}] New database backup created: ${fileName}`
             )
 
-            const size = fs.statSync(fileName).size
             const time = (performance.now() - start) / 1000
+            const size = (await filesService.readOne(await upload)).filesize
 
-            fs.unlinkSync(fileName)
             return {
                 connection,
                 time,
                 size,
             }
         } catch (e) {
-            if (fs.existsSync(fileName)) {
-                fs.unlinkSync(fileName)
-            }
+            await filesService.deleteByQuery({
+                filter: {
+                    title: {
+                        _eq: fileName,
+                    },
+                },
+            })
+
             logger.error(
                 `[${pkg.name}] Error on database backup: ${
                     (e as Error).message
