@@ -1,18 +1,18 @@
 import { defineOperationApp } from "@directus/extensions-sdk"
 
+const storageOptions = [
+    { text: "Local", value: "local" },
+    { text: "S3", value: "s3" },
+    { text: "Google Cloud Storage", value: "gcs" },
+    { text: "Azure", value: "azure" },
+]
+
 export default defineOperationApp({
     id: "backup",
     name: "Backup",
     icon: "backup",
     description: "Backup your Postgres DB",
     overview: ({ storage, folder }) => {
-        const storageOptions = [
-            { text: "Local", value: "local" },
-            { text: "S3", value: "s3" },
-            { text: "Google Cloud Storage", value: "gcs" },
-            { text: "Azure", value: "azure" },
-        ]
-
         const labels = [
             {
                 label: "Backup Storage",
