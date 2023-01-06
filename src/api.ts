@@ -72,6 +72,11 @@ export default defineOperationApi<{
                 },
             })
 
+            const message = JSON.stringify((e as Error).message).replace(
+                /(?:PGPASSWORD\=)[^\s]+/,
+                "PGPASSWORD=********"
+            )
+
             logger.error(
                 `[${pkg.name}] Error on database backup: ${
                     (e as Error).message
@@ -79,7 +84,7 @@ export default defineOperationApi<{
             )
             throw {
                 connection,
-                error: (e as Error).message,
+                error: message,
             }
         }
     },
